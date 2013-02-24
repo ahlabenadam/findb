@@ -13,15 +13,16 @@ root=home + '/src/finance'
 dbpath=root + '/stock.db'
 slist=root + '/stock_list'
 
-def update_db(symbol, tdate, open, last ):
+def update_db(symbol, tdate, open, last, curdate, curtime):
 	conn = sqlite3.connect(dbpath)
 	cursor = conn.cursor()
 	sql = """
 	create table if not exists """ + symbol + """
-	(date text, open num, close num)
+	(tdate text, open num, close num, curdate text, curtime text)
 	"""
 	cursor.execute(sql)
-	cursor.executemany('insert into '+symbol+' values (?,?,?)', [(tdate, open, last)])
+	cursor.executemany('insert into '+symbol+' values (?,?,?,?,?)',
+						[(tdate, open, last, curdate, curtime)])
 	conn.commit()
 
 
@@ -36,8 +37,10 @@ def open_last(element):
 	sopen = get_child(element, 'open')
 	slast = get_child(element, 'last')
 	stdate = get_child(element,'trade_date_utc')
+	cdate  = get_child(element, 'current_date_utc')
+	ctime = get_child(element,  'current_time_utc')
 	
-	return sopen, slast, stdate
+	return sopen, slast, stdate, cdate, ctime
 
 
 def symbol_get_exch_data(symbol):
@@ -62,8 +65,8 @@ def symbol_get_exch_data(symbol):
 	if finance is None:
 		print "Element not found"
 
-	sym_open, sym_last, sym_tdate  = open_last(finance)
-	update_db(symbol, sym_tdate, sym_open, sym_last)
+	sym_open, sym_last, sym_tdate, cdate, ctime  = open_last(finance)
+	update_db(symbol, sym_tdate, sym_open, sym_last, cdate, ctime)
 
 
 slist = open(slist, 'r')

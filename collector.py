@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import os
+import time
 from fin_db import DB
 from symbol import Stock
 
@@ -21,13 +22,14 @@ db = DB(dbpath)
 	
 stocks = db.get_stocks()
 
-query=[]
 for s in stocks:
+	query=[]
+	time.sleep(10)
 	s.update()
 	cmd="INSERT INTO  data VALUES(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (\
     s.get_id(), s.sopen, s.last, s.high, s.low, s.volume, s.avgvol, s.mktcap, s.td_UTC, s.cd_UTC, s.ct_UTC\
 	)
 	query.append(cmd)
+	db.execute(query)
 
-db.execute(query)
 

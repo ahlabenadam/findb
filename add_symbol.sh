@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SYM="stock_$1"
-DB=$2
+sym=`echo $1 | tr [a-z] [A-Z]`
+SYM="stock_$sym"
 
 echo "INSERT INTO  stock VALUES(NULL, \"$SYM\", NULL, 1, 1);"

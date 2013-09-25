@@ -71,23 +71,25 @@ for finance in root.findall('finance'):
 				return data
 
 	symbol = get_child(finance,'symbol')
-	sopen  = get_child(finance, 'open')
-	if sopen is not None:
+	avgvol = get_child(finance, 'avg_volume')
+	mktcap = get_child(finance, 'market_cap')
+	if avgvol is not None  and mktcap is not None:
+		volume = get_child(finance, 'volume')
+		sopen  = get_child(finance, 'open')
 		last   = get_child(finance, 'last')
 		high   = get_child(finance, 'high')
 		low    = get_child(finance, 'low')
-		volume = get_child(finance, 'volume')
-		avgvol = get_child(finance, 'avg_volume')
-		mktcap = get_child(finance, 'market_cap')
 		td_UTC = get_child(finance, 'trade_date_utc')
 		cd_UTC = get_child(finance, 'current_date_utc')
 		ct_UTC = get_child(finance, 'current_time_utc')
 
-		cmd="INSERT INTO  data VALUES(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (\
-		get_sid(symbol), sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC)
-		query.append(cmd)
+		#cmd="INSERT INTO  data VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (\
+		#symbol, sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC)
+		#print cmd
+		#query.append(cmd)
+		query.append((get_sid(symbol), sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC))
 	else:
 		print "Symbol " + symbol + " has no data"
-
-db.execute(query)
+	
+db.executemany('INSERT INTO data VALUES(?,?,?,?,?,?,?,?,?,?,?)',query)
 

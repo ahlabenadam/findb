@@ -76,20 +76,28 @@ for finance in root.findall('finance'):
 	if avgvol is not None  and mktcap is not None:
 		volume = get_child(finance, 'volume')
 		sopen  = get_child(finance, 'open')
+		if sopen is None:
+			sopen = 0
 		last   = get_child(finance, 'last')
 		high   = get_child(finance, 'high')
-		low    = get_child(finance, 'low')
+		if high is None:
+			high = 0
+		low = get_child(finance, 'low')
+		if low is None:
+			low = 0
 		td_UTC = get_child(finance, 'trade_date_utc')
 		cd_UTC = get_child(finance, 'current_date_utc')
 		ct_UTC = get_child(finance, 'current_time_utc')
 
-		#cmd="INSERT INTO  data VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (\
-		#symbol, sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC)
+		cmd="INSERT INTO  data VALUES(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (\
+		get_sid(symbol), sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC)
 		#print cmd
-		#query.append(cmd)
-		query.append((get_sid(symbol), sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC))
+		query.append(cmd)
+		#Use for newer sqlite interface
+		#query.append((get_sid(symbol), sopen, last, high, low, volume, avgvol, mktcap, td_UTC, cd_UTC, ct_UTC))
 	else:
 		print "Symbol " + symbol + " has no data"
 	
-db.executemany('INSERT INTO data VALUES(?,?,?,?,?,?,?,?,?,?,?)',query)
+#db.executemany('INSERT INTO data VALUES(?,?,?,?,?,?,?,?,?,?,?)',query)
+db.execute(query)
 
